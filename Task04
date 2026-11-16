@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+#define DISTRICTS 38
+#define MONTHS 12
+
+void analyze_rainfall(double rain[DISTRICTS][MONTHS]) {
+    double district_annual_totals[DISTRICTS] = {0};
+    double state_monthly_totals[MONTHS] = {0};
+    double state_total_annual = 0;
+    
+    double max_rain = -1.0;
+    int wettest_district = 0, wettest_month = 0;
+
+    // Calculate totals and find the wettest district-month
+    for (int d = 0; d < DISTRICTS; d++) {
+        for (int m = 0; m < MONTHS; m++) {
+            double amount = rain[d][m];
+            
+            district_annual_totals[d] += amount;
+            state_monthly_totals[m] += amount;
+            state_total_annual += amount;
+
+            if (amount > max_rain) {
+                max_rain = amount;
+                wettest_district = d;
+                wettest_month = m;
+            }
+        }
+    }
+
+    double state_annual_average = state_total_annual / DISTRICTS;
+    double threshold = 0.60 * state_annual_average;
+
+    printf("--- Rainfall Analysis ---\n");
+    printf("Wettest District-Month: District %d, Month %d (%.2f mm)\n\n", 
+           wettest_district + 1, wettest_month + 1, max_rain);
+
+    printf("State Monthly Averages:\n");
+    for (int m = 0; m < MONTHS; m++) {
+        printf("Month %d: %.2f mm\n", m + 1, state_monthly_totals[m] / DISTRICTS);
+    }
+
+    printf("\nDistricts Below 60%% of State Average (Threshold: %.2f mm):\n", threshold);
+    for (int d = 0; d < DISTRICTS; d++) {
+        if (district_annual_totals[d] < threshold) {
+            printf("District %d (Total: %.2f mm)\n", d + 1, district_annual_totals[d]);
+        }
+    }
+}
+
+int main(void) {
+    // Example initialization of the 38x12 array with dummy data
+    double rain[DISTRICTS][MONTHS] = {0}; 
+    
+    // Adding dummy data to test the logic
+    rain[0][5] = 450.5; // Make district 1, month 6 the wettest
+    rain[1][2] = 10.0;  // Make district 2 very dry (likely below 60%)
+    
+    analyze_rainfall(rain);
+    
+    return 0;
+}
